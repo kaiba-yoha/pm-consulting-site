@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/article/ArticleCard.astro';
+import { getCollection } from 'astro:content';
+import { categoryLabels } from '../../lib/utils';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const categories = Object.keys(categoryLabels) as string[];
+---
+
+<BaseLayout
+  title="記事一覧"
+  description="PMFlow全記事一覧。AIワークフロー・フレームワーク・チーム運営・炎上対策・ツール紹介など。"
+>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-text-base mb-2">記事一覧</h1>
+      <p class="text-text-muted">全 {sortedPosts.length} 記事</p>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="flex flex-wrap gap-2 mb-8">
+      <a
+        href="/blog"
+        class="px-4 py-1.5 rounded-full text-sm font-medium bg-primary-500 text-white"
+      >
+        すべて
+      </a>
+      {categories.map(cat => (
+        <a
+          href={`/blog/category/${cat}`}
+          class="px-4 py-1.5 rounded-full text-sm font-medium border border-border bg-surface-card text-text-base hover:bg-primary-50 hover:border-primary-300 transition-colors"
+        >
+          {categoryLabels[cat]}
+        </a>
+      ))}
+    </div>
+
+    {sortedPosts.length === 0 ? (
+      <p class="text-text-muted text-center py-20">記事がありません。</p>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedPosts.map(post => (
+          <ArticleCard
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            category={post.data.category}
+            tags={post.data.tags}
+            slug={post.id}
+            featured={post.data.featured}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>

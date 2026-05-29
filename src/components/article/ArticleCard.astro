@@ -1,0 +1,62 @@
+---
+import { formatDate } from '../../lib/utils';
+import CategoryLabel from '../ui/CategoryLabel.astro';
+import TagBadge from '../ui/TagBadge.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  category: string;
+  tags: string[];
+  slug: string;
+  featured?: boolean;
+}
+
+const { title, description, pubDate, category, tags, slug, featured } = Astro.props;
+---
+
+<article class={`bg-surface-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group ${featured ? 'ring-2 ring-accent-500' : ''}`}>
+  {featured && (
+    <div class="bg-accent-500 text-white text-xs font-semibold px-3 py-1 text-center tracking-wider">
+      FEATURED
+    </div>
+  )}
+  <div class="p-6">
+    <div class="flex items-center gap-2 mb-3">
+      <CategoryLabel category={category} href={`/blog/category/${category}`} />
+      <time datetime={pubDate.toISOString()} class="text-xs text-text-muted ml-auto">
+        {formatDate(pubDate)}
+      </time>
+    </div>
+
+    <h2 class="text-lg font-bold text-text-base mb-2 leading-snug group-hover:text-primary-600 transition-colors">
+      <a href={`/blog/${slug}`} class="hover:underline">
+        {title}
+      </a>
+    </h2>
+
+    <p class="text-sm text-text-muted leading-relaxed mb-4 line-clamp-2">
+      {description}
+    </p>
+
+    {tags.length > 0 && (
+      <div class="flex flex-wrap gap-1.5">
+        {tags.slice(0, 3).map(tag => (
+          <TagBadge tag={tag} href={`/blog/tag/${tag}`} />
+        ))}
+      </div>
+    )}
+  </div>
+  <div class="px-6 pb-4">
+    <a
+      href={`/blog/${slug}`}
+      class="inline-flex items-center text-sm font-medium text-primary-500 hover:text-primary-700 transition-colors"
+    >
+      続きを読む
+      <svg class="ml-1 w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 8h10M9 4l4 4-4 4"/>
+      </svg>
+    </a>
+  </div>
+</article>

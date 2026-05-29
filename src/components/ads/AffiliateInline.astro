@@ -1,0 +1,124 @@
+---
+import {
+  affiliateBooks,
+  affiliateSaaS,
+  buildAmazonLink,
+  getBooksByCategory,
+  getSaaSByCategory,
+  type AffiliateBook,
+  type AffiliateSaaS,
+} from '../../lib/affiliates';
+
+interface Props {
+  /** カテゴリ指定でマッチするアイテムを表示（未指定時はランダム） */
+  category?: string;
+  /** 表示タイプを強制指定。未指定時はカテゴリマッチで自動選択 */
+  type?: 'book' | 'saas-tool' | 'amazon' | 'tool';
+  /** 直接ASINを指定する場合（typeより優先） */
+  asin?: string;
+  title?: string;
+  description?: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  price?: string;
+}
+
+const {
+  category,
+  type: forcedType,
+  asin,
+  title: propTitle,
+  description: propDescription,
+  imageUrl,
+  linkUrl,
+  price,
+} = Astro.props;
+
+// --- アイテム解決ロジック ---
+let resolvedType: 'book' | 'saas-tool' | 'amazon' | 'tool' = forcedType ?? 'book';
+let resolvedTitle = propTitle ?? 'おすすめ書籍・ツール';
+let resolvedDescription = propDescription ?? 'PMの実務に役立つリソースです。';
+let resolvedUrl = linkUrl ?? '#';
+let resolvedAsin = asin;
+
+if (!asin && !propTitle) {
+  // カテゴリまたはランダムでアイテムを選択
+  const matchedBooks = category ? getBooksByCategory(category) : affiliateBooks;
+  const matchedSaaS = category ? getSaaSByCategory(category) : affiliateSaaS;
+
+  // カテゴリマッチ書籍 → カテゴリマッチSaaS → 全書籍ランダム の優先順位
+  if (matchedBooks.length > 0) {
+    // ページロードごとに擬似ランダム選択（SSGのためビルド時固定）
+    const book: AffiliateBook = matchedBooks[Math.floor(Math.random() * matchedBooks.length)];
+    resolvedType = 'book';
+    resolvedTitle = book.title;
+    resolvedDescription = `著者: ${book.author} — ${book.description}`;
+    resolvedAsin = book.asin;
+    resolvedUrl = buildAmazonLink(book.asin);
+  } else if (matchedSaaS.length > 0) {
+    const tool: AffiliateSaaS = matchedSaaS[Math.floor(Math.random() * matchedSaaS.length)];
+    resolvedType = 'saas-tool';
+    resolvedTitle = tool.name;
+    resolvedDescription = tool.description;
+    resolvedUrl = tool.url;
+  } else {
+    // フォールバック: 全書籍からランダム
+    const book = affiliateBooks[Math.floor(Math.random() * affiliateBooks.length)];
+    resolvedType = 'book';
+    resolvedTitle = book.title;
+    resolvedDescription = `著者: ${book.author} — ${book.description}`;
+    resolvedAsin = book.asin;
+    resolvedUrl = buildAmazonLink(book.asin);
+  }
+} else if (resolvedAsin && !propTitle) {
+  // ASIN直接指定 + タイトル未指定の場合はAmazonリンクを構築
+  resolvedUrl = buildAmazonLink(resolvedAsin);
+} else {
+  // プロップ直接指定
+  resolvedUrl = resolvedAsin
+    ? buildAmazonLink(resolvedAsin)
+    : (linkUrl ?? '#');
+}
+
+const bgColor = resolvedType === 'book'
+  ? 'bg-blue-50 border-blue-200'
+  : (resolvedType === 'saas-tool' || resolvedType === 'tool')
+  ? 'bg-purple-50 border-purple-200'
+  : 'bg-amber-50 border-amber-200';
+
+const label = resolvedType === 'book'
+  ? '書籍紹介'
+  : (resolvedType === 'saas-tool' || resolvedType === 'tool')
+  ? 'ツール紹介'
+  : 'Amazonで見る';
+---
+
+<div class={`my-6 p-4 rounded-xl border ${bgColor} flex gap-4 items-start`}>
+  {imageUrl && (
+    <a href={resolvedUrl} target="_blank" rel="noopener noreferrer nofollow" class="flex-shrink-0">
+      <img src={imageUrl} alt={resolvedTitle} class="w-20 h-auto rounded shadow-sm" />
+    </a>
+  )}
+  <div class="flex-1 min-w-0">
+    <p class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">{label}</p>
+    <h4 class="font-bold text-text-base mb-1 leading-snug">{resolvedTitle}</h4>
+    <p class="text-sm text-text-muted leading-relaxed mb-2">{resolvedDescription}</p>
+    {price && <p class="text-sm font-semibold text-text-base mb-2">{price}</p>}
+    <a
+      href={resolvedUrl}
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-700 transition-colors"
+    >
+      詳細を見る
+      <svg class="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 7h8M7 3l4 4-4 4"/>
+      </svg>
+    </a>
+  </div>
+</div>
+
+<!-- A8.net バナー設置方法:
+  A8.netの場合、アフィリエイトリンクのHTMLをそのままここに貼り付けてください。
+  例: <a href="https://px.a8.net/svt/ejp?a8mat=..." target="_blank" rel="nofollow">...</a>
+-->

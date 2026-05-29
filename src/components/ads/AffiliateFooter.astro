@@ -1,0 +1,42 @@
+---
+const AMAZON_ASSOCIATE_ID = 'YOUR_AMAZON_ASSOCIATE_ID';
+---
+
+<section class="bg-primary-50 border border-primary-100 rounded-xl p-6 my-8">
+  <p class="text-xs text-text-muted mb-3 font-semibold uppercase tracking-wider">スポンサー / おすすめツール</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <a
+      href={`https://www.amazon.co.jp?tag=${AMAZON_ASSOCIATE_ID}`}
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      class="flex items-center gap-3 bg-white rounded-lg border border-border p-3 hover:shadow-sm transition-shadow group"
+    >
+      <div class="w-10 h-10 bg-accent-400 rounded-md flex items-center justify-center text-white flex-shrink-0">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L13 10.414V15a1 1 0 01-.553.894l-4 2A1 1 0 017 17v-6.586L3.293 6.707A1 1 0 013 6V4z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-text-base group-hover:text-primary-600 transition-colors">Amazonで書籍を探す</p>
+        <p class="text-xs text-text-muted">PM関連書籍多数</p>
+      </div>
+    </a>
+
+    <!-- A8.net フッターバナー設置方法:
+      下のdiv内にA8.netから取得したバナーHTMLを貼り付けてください。
+      SaaS系ツール（Notion, Asana, Slack等）のアフィリエイトバナーが適しています。
+    -->
+    <div class="flex items-center gap-3 bg-white rounded-lg border border-border p-3">
+      <div class="w-10 h-10 bg-primary-300 rounded-md flex items-center justify-center text-white flex-shrink-0">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+          <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-text-base">おすすめPMツール</p>
+        <p class="text-xs text-text-muted">A8.netバナーをここに設置</p>
+      </div>
+    </div>
+  </div>
+</section>

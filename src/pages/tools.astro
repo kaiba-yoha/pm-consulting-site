@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const AMAZON_ASSOCIATE_ID = 'YOUR_AMAZON_ASSOCIATE_ID';
+
+const tools = [
+  {
+    category: 'プロジェクト管理',
+    items: [
+      {
+        name: 'Notion',
+        description: 'All-in-oneワークスペース。タスク・ドキュメント・データベースを一元管理。PM業務のベースツールとして最適。',
+        url: 'https://www.notion.so',
+        affiliate: false,
+        tag: 'FREE',
+      },
+      {
+        name: 'Linear',
+        description: 'エンジニアリングチーム向け高速イシュートラッカー。スプリント管理・ロードマップ機能が強力。',
+        url: 'https://linear.app',
+        affiliate: false,
+        tag: 'FREE',
+      },
+      {
+        name: 'Asana',
+        description: '大規模プロジェクト管理の定番ツール。ガントチャート・ポートフォリオ管理でPM業務を効率化。',
+        url: 'https://asana.com',
+        affiliate: false,
+        tag: 'PAID',
+      },
+    ],
+  },
+  {
+    category: 'AIアシスタント',
+    items: [
+      {
+        name: 'Claude (Anthropic)',
+        description: '文書作成・要件定義・リスク分析など、PM業務全般をサポート。長文コンテキストの扱いが得意。',
+        url: 'https://claude.ai',
+        affiliate: false,
+        tag: 'FREE',
+      },
+      {
+        name: 'ChatGPT',
+        description: '会議アジェンダ作成・ステークホルダー向けレポート生成・アイデアブレストに活用できる万能AI。',
+        url: 'https://chat.openai.com',
+        affiliate: false,
+        tag: 'FREE',
+      },
+      {
+        name: 'Gemini Advanced',
+        description: 'Google Workspaceと連携したAI。スプレッドシート・ドキュメントでのデータ分析に強い。',
+        url: 'https://gemini.google.com',
+        affiliate: false,
+        tag: 'PAID',
+      },
+    ],
+  },
+  {
+    category: 'コミュニケーション',
+    items: [
+      {
+        name: 'Slack',
+        description: 'チームコミュニケーションの標準ツール。ワークフロー自動化・外部連携でPM業務を効率化。',
+        url: 'https://slack.com',
+        affiliate: false,
+        tag: 'FREE',
+      },
+      {
+        name: 'Loom',
+        description: '非同期ビデオコミュニケーション。会議を減らし、説明動画で理解促進。リモートチームに必須。',
+        url: 'https://www.loom.com',
+        affiliate: false,
+        tag: 'FREE',
+      },
+    ],
+  },
+];
+
+const amazonBooks = [
+  {
+    asin: 'B00MFPJFXQ',
+    title: 'エッセンシャル思考',
+    author: 'グレッグ・マキューン',
+    description: '少人数・限られたリソースで最大の成果を出すための考え方。PM必読の一冊。',
+    price: '¥1,760',
+  },
+  {
+    asin: '4822255018',
+    title: 'プロジェクトマネジメント知識体系ガイド (PMBOK)',
+    author: 'PMI',
+    description: 'PM資格取得にも役立つ標準的な知識体系。実務の辞書として手元に置いておきたい。',
+    price: '¥5,500',
+  },
+  {
+    asin: '4798167932',
+    title: '超高速でPDCAを回す 最強の仕事術',
+    author: '富田和成',
+    description: 'スピードと精度を両立させるPDCAサイクルの回し方。炎上回避に直結するメソッド。',
+    price: '¥1,650',
+  },
+];
+---
+
+<BaseLayout
+  title="PMにおすすめのツール・書籍"
+  description="コンサルティングPMが実際に使うツールと書籍を厳選紹介。プロジェクト管理・AIアシスタント・コミュニケーションツール。"
+>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold text-text-base mb-3">PM向けツール・書籍</h1>
+      <p class="text-text-muted leading-relaxed max-w-2xl">
+        コンサルティングPMが実際に使うツールと書籍を厳選しました。AIを活用した効率化から、チーム管理ツールまで幅広く紹介します。
+      </p>
+      <p class="text-xs text-text-muted mt-2">※当サイトはアフィリエイト広告を利用しています</p>
+    </div>
+
+    <!-- SaaS Tools -->
+    {tools.map(section => (
+      <section class="mb-12">
+        <h2 class="text-xl font-bold text-text-base mb-5 pb-2 border-b border-border">
+          {section.category}
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {section.items.map(tool => (
+            <a
+              href={tool.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bg-surface-card rounded-xl border border-border p-5 hover:shadow-md transition-all duration-200 group"
+            >
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="font-bold text-text-base group-hover:text-primary-600 transition-colors">
+                  {tool.name}
+                </h3>
+                <span class={`text-xs font-semibold px-2 py-0.5 rounded-full ${tool.tag === 'FREE' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                  {tool.tag}
+                </span>
+              </div>
+              <p class="text-sm text-text-muted leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <!-- Amazon Books -->
+    <section class="mb-12">
+      <h2 class="text-xl font-bold text-text-base mb-5 pb-2 border-b border-border">
+        おすすめ書籍 (Amazon)
+      </h2>
+      <!-- A8.net バナー設置方法:
+        書籍系アフィリエイトがある場合はここに貼り付けてください。
+        例: <a href="https://px.a8.net/..." target="_blank" rel="nofollow">...</a>
+      -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {amazonBooks.map(book => (
+          <a
+            href={`https://www.amazon.co.jp/dp/${book.asin}?tag=${AMAZON_ASSOCIATE_ID}`}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            class="bg-surface-card rounded-xl border border-border p-5 hover:shadow-md transition-all duration-200 group"
+          >
+            <div class="w-full h-32 bg-primary-50 rounded-lg mb-3 flex items-center justify-center text-primary-300">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="currentColor">
+                <path d="M8 6a2 2 0 012-2h20a2 2 0 012 2v28a2 2 0 01-2 2H10a2 2 0 01-2-2V6zm4 2v24h16V8H12z"/>
+              </svg>
+            </div>
+            <h3 class="font-bold text-text-base group-hover:text-primary-600 transition-colors mb-1 leading-snug">
+              {book.title}
+            </h3>
+            <p class="text-xs text-text-muted mb-2">{book.author}</p>
+            <p class="text-sm text-text-muted leading-relaxed mb-3">{book.description}</p>
+            <p class="text-sm font-bold text-accent-600">{book.price}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>

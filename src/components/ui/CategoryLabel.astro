@@ -1,0 +1,25 @@
+---
+import { categoryLabels, categoryColors } from '../../lib/utils';
+
+interface Props {
+  category: string;
+  href?: string;
+}
+
+const { category, href } = Astro.props;
+const label = categoryLabels[category] ?? category;
+const colorClass = categoryColors[category] ?? 'bg-gray-100 text-gray-800';
+---
+
+{href ? (
+  <a
+    href={href}
+    class={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold transition-opacity hover:opacity-80 ${colorClass}`}
+  >
+    {label}
+  </a>
+) : (
+  <span class={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold ${colorClass}`}>
+    {label}
+  </span>
+)}
