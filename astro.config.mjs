@@ -4,7 +4,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://pmflow.karmait.net',
+  site: 'https://pmf.karmait.net',
   integrations: [
     mdx(),
     sitemap(),
