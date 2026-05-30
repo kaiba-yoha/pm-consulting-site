@@ -1,0 +1,147 @@
+---
+title: "Notionデータベースでプロジェクト管理：PMが最初に作るべきテンプレート構成"
+description: "NotionのRelation・Rollup・Filterを活用したプロジェクト管理システムの設計方法。PMが最初に作るべきデータベース構成とテンプレートを実践的に解説。"
+pubDate: 2026-03-24
+category: tools
+tags: ["Notion", "データベース", "テンプレート", "プロジェクト管理", "設計"]
+featured: false
+draft: false
+affiliate: false
+postedVia: manual
+---
+
+NotionのデータベースはExcelより柔軟で、専用ツールより自由度が高い。しかし設計を間違えると「管理のための管理」になってしまう。本稿では、PMが実際に使えるNotionのデータベース構成と設計原則を解説する。
+
+## PMが最初に作る4つのデータベース
+
+Notionでプロジェクト管理を始める場合、以下の4つのデータベースから始めることを推奨する。
+
+```
+1. Projects DB（プロジェクト一覧）
+2. Tasks DB（タスク管理）
+3. Meetings DB（会議・議事録）
+4. Risks DB（リスクログ）
+```
+
+この4つをRelationで接続することで、プロジェクト単位での全情報一覧が実現できる。
+
+## データベース1：Projects DB
+
+**プロパティ設計：**
+- プロジェクト名（タイトル）
+- ステータス（Not started / In progress / Completed / On hold）
+- 担当PM（Person）
+- 開始日（Date）
+- 期限日（Date）
+- クライアント名（テキスト）
+- 優先度（Select：High / Medium / Low）
+- タグ（Multi-select）
+
+**便利なビュー：**
+- ボードビュー（ステータス別）
+- ガントビュー（期間可視化）
+- テーブルビュー（全プロパティ表示）
+
+## データベース2：Tasks DB（プロジェクトに紐付け）
+
+**プロパティ設計：**
+- タスク名（タイトル）
+- プロジェクト（Relation → Projects DB）
+- 担当者（Person）
+- ステータス（Not started / In progress / Done / Blocked）
+- 優先度（Select）
+- 開始日・期限日（Date）
+- 工数見積もり（Number）
+- 実績工数（Number）
+- ブロッカー（テキスト）
+
+**Rollup活用：**
+Projects DBに「完了タスク数」「合計工数」をRollupで追加することで、プロジェクト一覧からタスクの進捗が見える。
+
+```
+Rollupの設定：
+- 関係するプロパティ：Tasks（Relation）
+- 集計対象プロパティ：ステータス
+- 計算：Count values（"Done"のフィルタを適用）
+```
+
+## データベース3：Meetings DB
+
+**プロパティ設計：**
+- 会議名（タイトル）
+- プロジェクト（Relation → Projects DB）
+- 日時（Date）
+- 参加者（Person）
+- 会議の種類（Select：定例・キックオフ・レビュー等）
+- アクションアイテム（テキスト）
+
+**テンプレートを作成する：**
+Meetings DBのテンプレートとして「議事録テンプレート」を設定しておくと、新しい議事録ページを開くたびに自動でフォーマットが適用される。
+
+<AffiliateInline type="saas-tool" />
+
+## データベース4：Risks DB
+
+**プロパティ設計：**
+- リスク内容（タイトル）
+- プロジェクト（Relation → Projects DB）
+- 発生確率（Select：High / Medium / Low）
+- 影響度（Select：High / Medium / Low）
+- リスクスコア（Formula）
+- 対応策（テキスト）
+- 発生時対応（テキスト）
+- オーナー（Person）
+- ステータス（Select：Open / Monitoring / Closed）
+
+**リスクスコアのFormula：**
+```
+ifs(
+  prop("発生確率") == "High" and prop("影響度") == "High", "HH",
+  prop("発生確率") == "High" and prop("影響度") == "Medium", "HM",
+  prop("発生確率") == "Medium" and prop("影響度") == "High", "MH",
+  true, "Low"
+)
+```
+
+## データベース間のRelation設計
+
+4つのデータベースをRelationで接続するイメージは以下の通り。
+
+```
+Projects DB
+    ↕ (Relation)
+Tasks DB ←→ Meetings DB
+    ↕ (Relation)
+Risks DB
+```
+
+すべてをProjectsに紐付けることで、「このプロジェクトのすべての情報（タスク・議事録・リスク）」を1ページで確認できるプロジェクトページを作れる。
+
+## プロジェクトページのテンプレート設計
+
+Projects DBの各プロジェクトページに以下のブロックを含むテンプレートを設定する：
+
+```
+# [プロジェクト名]
+
+## プロジェクト概要
+[1〜2段落]
+
+## キーリンク
+- Figma：[リンク]
+- GitHub：[リンク]
+- Slack チャンネル：[リンク]
+
+## Linked DB：タスク
+（Tasks DBのRelation・現在進行中のみフィルタ）
+
+## Linked DB：直近の会議
+（Meetings DBのRelation・直近5件）
+
+## Linked DB：現在のリスク
+（Risks DBのRelation・OpenかMonitoringのみ）
+```
+
+## まとめ
+
+Notionのデータベース設計の核心は「Relation・Rollup・Filterの組み合わせ」だ。最初からすべてを完璧に設計しようとせず、まず基本の4データベースを作って使いながら改善する。1ヶ月使えば「何が便利で何が使いにくいか」が自然と分かってくる。

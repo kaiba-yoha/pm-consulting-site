@@ -1,0 +1,111 @@
+---
+title: "Google WorkspaceをPMが活用する：Docs・Sheets・Slides連携の効率化テクニック"
+description: "Google Workspace（Docs・Sheets・Slides・Forms）をプロジェクト管理に活用するPM向け実践ガイド。ツール間連携・Apps Script自動化・共同編集のベストプラクティスを解説。"
+pubDate: 2026-04-08
+category: tools
+tags: ["Google Workspace", "Google Docs", "Google Sheets", "Apps Script", "効率化"]
+featured: false
+draft: false
+affiliate: false
+postedVia: manual
+---
+
+Google WorkspaceはGmailを中心に多くの組織で使われているが、Docs・Sheets・Slides・Formsの組み合わせによる業務効率化は十分に活用されていないことが多い。本稿ではPMが実際に使える連携テクニックを解説する。
+
+## Google Docsの高速化テクニック
+
+**テンプレートギャラリーの活用：**
+Googleドライブでよく使うドキュメントの雛形（議事録・報告書・提案書）をテンプレートとして登録しておく。チームメンバーが新しいドキュメントを作る際に「テンプレートから作成」できるため、フォーマットの統一が自然に進む。
+
+**スマートチップの活用：**
+Google DocsでAltキー + Enterを押すと「スマートチップ」が挿入できる。メンバーのメールアドレス・他のドキュメントのリンク・日付・ミーティングのリンクなどをインラインで参照できる。
+
+**コメントとアクションアイテムの分離：**
+`@[メンバー名]`でメンションしながらコメントを書くと、そのメンバーにアクションアイテムとして割り当てられる。Google TasksやGmailと連携してリマインダーが送られる。
+
+## Google Sheetsの高度な活用
+
+**IMPORTRANGE関数で複数シート統合：**
+複数のシートに分散したデータを1ヶ所に統合する。
+
+```
+=IMPORTRANGE("https://docs.google.com/spreadsheets/d/[スプレッドシートID]/", "Sheet1!A:D")
+```
+
+チームメンバーが各自のシートに入力したデータを、PMが管理するサマリーシートに自動集約できる。
+
+**QUERY関数でSQLライクな集計：**
+
+```
+=QUERY(A:E, "SELECT A, B, SUM(C) WHERE D='完了' GROUP BY A, B", 1)
+```
+
+ステータスが「完了」のタスクだけを抽出して、担当者・フェーズ別に工数を集計する。ピボットテーブルよりも柔軟な集計が可能だ。
+
+**スプレッドシートでガントチャート（条件付き書式版）：**
+Excelと同様に条件付き書式でガントチャートを実装できる。さらにSheetsでは複数人が同時編集できるため、チーム全員がリアルタイムで更新できる。
+
+## Google Formsで情報収集を自動化
+
+**週次稼働確認フォーム：**
+毎週月曜日に自動送信されるフォームで、チームメンバーの「今週の稼働率・ブロッカー・懸念事項」を収集する。回答はSheetsに自動集積されるため、PMが個別にヒアリングする手間が省ける。
+
+**ステータス更新フォーム：**
+タスクの進捗更新をSlackで受け付けるとSlackが混雑する。代わりにGoogleフォームで「タスク名・進捗率・ブロッカー」を入力してもらい、Sheetsに蓄積する方法が情報の集約に便利だ。
+
+<AffiliateInline type="saas-tool" />
+
+## Apps Scriptで自動化する
+
+Google Apps Scriptを使うと、WorkspaceツールをPythonに近い感覚でプログラムできる。
+
+**活用例1：毎週月曜にSheetsのステータスレポートをGmailで送信**
+
+```javascript
+function sendWeeklyReport() {
+  const sheet = SpreadsheetApp.openById('[シートID]').getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  
+  // データを整形してHTMLメール生成
+  let emailBody = '<h2>週次ステータスレポート</h2>';
+  // ... データ処理 ...
+  
+  MailApp.sendEmail({
+    to: 'stakeholder@example.com',
+    subject: `週次レポート ${new Date().toLocaleDateString('ja-JP')}`,
+    htmlBody: emailBody
+  });
+}
+
+// トリガー設定：毎週月曜AM9時に実行
+```
+
+**活用例2：Formsの回答をSlackに通知**
+
+```javascript
+function onFormSubmit(e) {
+  const response = e.values;
+  const slackMessage = `新しいステータス更新：${response[1]}`;
+  
+  const slackUrl = 'https://hooks.slack.com/services/[WEBHOOK_URL]';
+  UrlFetchApp.fetch(slackUrl, {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify({text: slackMessage})
+  });
+}
+```
+
+## Slides：アニメーションを使わないプレゼン設計
+
+PMのプレゼンはアニメーションより情報の明快さが重要だ。
+
+**推奨のスライド設計：**
+- 1スライド1メッセージ（言いたいことが1行で書ける）
+- タイトルは「主張」を書く（「進捗状況」ではなく「Phase2は計画通り完了」）
+- 数字は大きく・テキストは少なく
+- グラフはSheetsから貼り付けてリンクを保持（データ変更に自動対応）
+
+## まとめ
+
+Google WorkspaceはGmailだけで使うには惜しいツール群だ。Docs・Sheets・Forms・Apps Scriptの組み合わせで、週次レポート・稼働確認・ステータス管理の多くを自動化できる。まずIMPORTRANGEとForms→Sheets連携から試してみることを推奨する。

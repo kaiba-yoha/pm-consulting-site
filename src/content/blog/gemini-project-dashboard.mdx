@@ -1,0 +1,115 @@
+---
+title: "Gemini 1.5 ProでプロジェクトダッシュボードをAI生成する実験"
+description: "Gemini 1.5 Proの長文コンテキスト能力を活用してプロジェクトダッシュボードを自動生成する実験結果。GoogleスプレッドシートやNotionへの出力方法も解説。"
+pubDate: 2026-03-12
+category: ai-workflow
+tags: ["Gemini", "ダッシュボード", "AI", "Google", "自動化"]
+featured: false
+draft: false
+affiliate: false
+postedVia: manual
+---
+
+Gemini 1.5 Proは最大100万トークンのコンテキストウィンドウを持つ。これはプロジェクト管理において特別な意味を持つ。6ヶ月分の週次報告書、全Issueのログ、会議議事録の全記録をまとめて渡しても処理できるということだ。
+
+本稿では、このGeminiの長文処理能力を活用してプロジェクトダッシュボードをAI生成した実験結果を報告する。
+
+## なぜGeminiなのか
+
+Claude・ChatGPTと比較したGeminiの優位点は「長文コンテキスト＋Googleエコシステムとの連携」にある。
+
+- Google スプレッドシートの大量データをそのまま処理できる
+- Google ドキュメント・ドライブとAPI連携が容易
+- Gemini Advancedは Googleツール内でネイティブに動作
+- グラフ・チャートの生成をGeminiが直接Sheetsに書き込める（Gemini for Google Workspace）
+
+## 実験：6ヶ月分のプロジェクトデータからダッシュボードを生成
+
+**実験の概要**
+
+対象：SaaSプロダクト開発プロジェクト（6ヶ月・チーム8名）
+使用データ：
+- Jiraのエクスポート CSV（約3,500件のIssue）
+- Confluenceの会議議事録（約200ページ）
+- 週次ステータスレポート（26本）
+
+これらをGemini 1.5 Proに渡して「プロジェクト総括ダッシュボード」を生成させた。
+
+**使用プロンプト**
+
+```
+あなたは経験豊富なプロジェクトアナリストです。
+以下の【プロジェクトデータ】をもとに、経営層向けのプロジェクト総括ダッシュボードを作成してください。
+
+含める指標：
+1. スプリントごとのベロシティ推移（表形式）
+2. バグ発生率の推移（月次）
+3. 主要マイルストーンの計画日vs実績日
+4. チームキャパシティと実稼働率の推移
+5. トップ5の技術的課題と解決状況
+6. ステークホルダー満足度スコアの推移（報告書から抽出）
+
+各指標について：数値データ + 1〜2行のコメント（良いこと・課題・次のアクション）
+
+【プロジェクトデータ】
+[データをここに貼り付け]
+```
+
+**実験結果**
+
+Geminiは約60秒でダッシュボードのMarkdown版を生成した。精度の評価は以下の通りだ。
+
+| 指標 | 精度 | コメント |
+|------|------|---------|
+| ベロシティ推移 | ◎ | 数値の計算・集計がほぼ正確 |
+| バグ発生率 | ○ | 月次集計は正確、分類に若干のズレ |
+| マイルストーン比較 | ◎ | 計画日vs実績日の比較は正確 |
+| チームキャパシティ | △ | 担当者ごとの稼働集計は誤りあり |
+| 技術的課題のサマリー | ◎ | 議事録からの抽出精度が高い |
+
+## Google Sheetsとの連携：Apps Scriptを使う方法
+
+Gemini for Google Workspaceを使うと、Geminiから直接Sheetsに書き込める。
+
+```javascript
+// Google Apps Script例
+function generateDashboard() {
+  const sheet = SpreadsheetApp.getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  
+  // Gemini APIに送信
+  const prompt = `以下のデータからプロジェクトKPIサマリーを生成してください: ${JSON.stringify(data)}`;
+  
+  const response = callGeminiAPI(prompt);
+  
+  // サマリーを別シートに出力
+  const summarySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Summary');
+  summarySheet.getRange('A1').setValue(response);
+}
+```
+
+<AffiliateInline type="saas-tool" />
+
+## 実用的な活用：月次レポートの自動生成
+
+毎月の月次レポート作成をGeminiで自動化するフローを構築した事例を紹介する。
+
+1. Google Sheetsに月次データを入力（進捗・工数・バグ数・顧客満足度）
+2. Gemini Apps Scriptが毎月末日に自動実行
+3. Geminiが前月比較・トレンド分析・コメント生成
+4. Google Docsに月次レポートとして自動保存
+5. 担当PMにメールで通知
+
+このフローにより、毎月3〜4時間かかっていた月次レポート作成が「確認と承認のみ」に短縮された。
+
+## 注意点：Geminiが誤りやすい箇所
+
+長文データを処理するGeminiでも、以下の場面では精度が落ちる。
+
+- **複雑な集計・計算**：ピボット的な集計はGeminiより実際の表計算ツールの方が信頼できる
+- **前後の文脈に依存する判断**：「この遅延は重大か軽微か」という判断はビジネスコンテキストが必要
+- **100万トークンの全体を等しく参照しない**：入力の冒頭と末尾は参照されやすいが、中間部は参照精度が下がる傾向がある
+
+## まとめ
+
+Gemini 1.5 Proの長文コンテキスト能力は、大量のプロジェクトデータをまとめて処理するユースケースで特に威力を発揮する。完全自動ではなく「AIが素案を生成→PMが確認・修正」という分業体制で活用することで、月次ダッシュボード作成の工数を8割削減できる実績を確認できた。

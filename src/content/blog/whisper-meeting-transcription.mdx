@@ -1,0 +1,119 @@
+---
+title: "OpenAI Whisperで会議録音を自動文字起こし：無料でできるセットアップ"
+description: "OpenAI Whisperをローカルで動かして会議録音を無料で文字起こしする方法。インストール手順から実際の精度・使い勝手まで、PMが知っておくべき実践情報を解説。"
+pubDate: 2026-02-10
+category: ai-workflow
+tags: ["Whisper", "文字起こし", "OpenAI", "音声認識", "自動化"]
+featured: false
+draft: false
+affiliate: false
+postedVia: manual
+---
+
+会議の録音を文字起こしするサービスは多いが、月額費用がかかるものがほとんどだ。OpenAI Whisperはオープンソースの音声認識モデルで、ローカル環境で無料かつ無制限に使える。精度はサービス版に劣らず、日本語にも対応している。
+
+本稿では、PMが会議録音の文字起こしをWhisperで自動化する方法を解説する。
+
+## Whisperとは
+
+OpenAI Whisperは2022年にオープンソースで公開された音声認識モデルだ。英語・日本語を含む99言語に対応しており、モデルサイズに応じてsmall（小さく速い）からlarge（大きく精度高）まで選べる。
+
+日本語の認識精度は、会議音声（複数人・多少のノイズあり）で約90〜95%程度。聞き返しや確認フレーズが多い会話では精度が下がる場合があるが、議事録の元データとして使うには十分な品質だ。
+
+## セットアップ：Pythonが使えるなら10分で完了
+
+**必要なもの：**
+- Python 3.8以上
+- pip（Pythonのパッケージ管理ツール）
+- FFmpeg（音声処理ライブラリ）
+
+**インストール手順（Mac/Linux）：**
+
+```bash
+# FFmpegのインストール（Macの場合）
+brew install ffmpeg
+
+# Whisperのインストール
+pip install openai-whisper
+
+# 動作確認
+whisper --help
+```
+
+**Windowsの場合：**
+
+FFmpegをWindowsに手動インストールしてから、同様にpipでWhisperをインストールする。Windows向けGUIツール「Whisper Desktop」を使えばコマンドラインなしで利用できる。
+
+## 使い方：基本コマンド
+
+```bash
+# 日本語音声の文字起こし（mediumモデル使用）
+whisper 会議録音.mp3 --language Japanese --model medium
+
+# 出力形式をテキストのみに限定（デフォルトはtxt・vtt・srt・json・tsv）
+whisper 会議録音.mp3 --language Japanese --model medium --output_format txt
+```
+
+出力されるファイル：
+- `.txt`：プレーンテキスト
+- `.vtt`：字幕形式（タイムスタンプ付き）
+- `.srt`：字幕形式（動画編集ソフトで読み込める）
+
+## モデルの選び方
+
+| モデル | サイズ | 速度 | 精度 | 推奨用途 |
+|-------|-------|------|------|---------|
+| tiny | 75MB | 最速 | △ | テスト用 |
+| small | 244MB | 速い | ○ | 短い録音 |
+| medium | 769MB | 普通 | ◎ | 会議録音 |
+| large | 1550MB | 遅い | ◎ | 重要な録音 |
+
+会議録音には**medium**が最もバランスが良い。1時間の会議録音で処理時間は5〜10分程度（CPU処理の場合）。GPUが使える環境なら2〜3分で完了する。
+
+## WhisperとClaudeを組み合わせた全自動フロー
+
+文字起こし後にClaudeで議事録を生成するフローをPythonスクリプトで自動化できる。
+
+```python
+import whisper
+import anthropic
+
+# Step 1: Whisperで文字起こし
+model = whisper.load_model("medium")
+result = model.transcribe("会議録音.mp3", language="ja")
+transcript = result["text"]
+
+# Step 2: Claudeで議事録生成
+client = anthropic.Anthropic()
+message = client.messages.create(
+    model="claude-opus-4-5",
+    max_tokens=2000,
+    messages=[{
+        "role": "user",
+        "content": f"以下の会議録音の文字起こしをもとに議事録を作成してください。\n\n{transcript}"
+    }]
+)
+print(message.content[0].text)
+```
+
+このスクリプトを実行すると、会議録音から議事録テキストまでが完全自動で生成される。
+
+<AffiliateInline type="saas-tool" />
+
+## 実際の精度と注意点
+
+**精度が高い場面：**
+- 静かな環境での1対1の対話
+- ヘッドセットマイクを使用した録音
+- 標準的なビジネス語彙を使う会話
+
+**精度が下がる場面：**
+- 複数人が同時に話す場面（話者分離はWhisper単体では困難）
+- 強い訛りや方言
+- 固有名詞（プロジェクト名・人名）
+
+固有名詞の認識精度を上げるには、`--initial_prompt` オプションで「このプロジェクトはXプロジェクト、参加者はAさん、Bさん」のような文脈情報をヒントとして渡せる。
+
+## まとめ
+
+OpenAI Whisperは、コストゼロで高品質な日本語文字起こしができる実用的なツールだ。月に10回以上会議がある場合、有料の文字起こしサービスと比較して年間数万円のコスト削減になる。ClaudeなどのLLMと組み合わせることで、録音から議事録まで完全自動化するパイプラインを構築できる。
