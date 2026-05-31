@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "post": "node scripts/post-article.js",
-    "post:dry": "node scripts/post-article.js --dry-run"
+    "post:dry": "node scripts/post-article.js --dry-run",
+    "deploy": "CLOUDFLARE_ACCOUNT_ID=04c11e992c8fcf8def5e35b7f7e07f87 npx wrangler pages deploy dist --project-name=pmf --branch=master --commit-dirty=true"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.1",
