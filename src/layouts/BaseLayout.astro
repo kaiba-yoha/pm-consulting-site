@@ -80,6 +80,20 @@ const fullTitle = title.includes('PMFlow') ? title : `${title} | PMFlow`;
       gtag('js', new Date());
       gtag('config', 'G-EYF1LW5M88');
     </script>
+    <!-- アフィリクリック計測 (P0-7): a8/amazon/楽天を自動判定 -->
+    <script>
+      document.addEventListener('click', function (e) {
+        var a = e.target && e.target.closest && e.target.closest('a[href]');
+        if (!a) return;
+        var href = a.href || '';
+        var net = /a8\.net|a8mat=/.test(href) ? 'a8'
+          : /amazon\.co\.jp|amzn\.to/.test(href) ? 'amazon'
+          : /rakuten\.co\.jp|hb\.afl\.rakuten/.test(href) ? 'rakuten' : null;
+        if (net && typeof gtag === 'function') {
+          gtag('event', 'affi_click', { affi_network: net, link_url: href, page_path: location.pathname });
+        }
+      }, true);
+    </script>
   </head>
   <body class="min-h-screen flex flex-col">
     <Header />
