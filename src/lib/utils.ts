@@ -31,7 +31,7 @@ export function generateSlug(text: string): string {
 /**
  * Build an Amazon affiliate link
  */
-export function buildAmazonAffiliateLink(asin: string, associateId: string = 'YOUR_AMAZON_ASSOCIATE_ID'): string {
+export function buildAmazonAffiliateLink(asin: string, associateId: string = 'karmait-22'): string {
   return `https://www.amazon.co.jp/dp/${asin}?tag=${associateId}`;
 }
 
