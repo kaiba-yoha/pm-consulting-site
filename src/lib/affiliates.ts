@@ -3,7 +3,7 @@
  * アフィリエイトリンク・書籍・SaaSツールの一元管理
  */
 
-export const AMAZON_ASSOCIATE_ID = process.env.AMAZON_ASSOCIATE_ID ?? 'YOUR-ASSOCIATE-ID-22';
+export const AMAZON_ASSOCIATE_ID = process.env.AMAZON_ASSOCIATE_ID ?? 'karmait-22';
 
 // --- 書籍アフィリエイト ---
 export interface AffiliateBook {
