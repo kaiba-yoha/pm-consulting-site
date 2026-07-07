@@ -48,9 +48,10 @@ const { title, description, pubDate, updatedDate, category, tags, ogImage, noind
           <div class="flex items-center gap-2 mb-3">
             <CategoryLabel category={category} href={`/blog/category/${category}`} />
           </div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-text-base leading-tight mb-4">
+          <h1 class="text-2xl sm:text-3xl font-bold text-text-base leading-tight mb-2">
             {title}
           </h1>
+          <p class="text-xs text-text-muted mb-4">本ページはプロモーションが含まれています</p>
           <p class="text-text-muted leading-relaxed mb-4">{description}</p>
 
           <div class="flex flex-wrap items-center gap-3 text-sm text-text-muted pb-4 border-b border-border">
@@ -88,7 +89,7 @@ const { title, description, pubDate, updatedDate, category, tags, ogImage, noind
         </div>
 
         <!-- Affiliate Footer -->
-        {post.data.affiliate && <AffiliateFooter />}
+        <AffiliateFooter />
 
         <!-- Related Articles -->
         {relatedPosts.length > 0 && (

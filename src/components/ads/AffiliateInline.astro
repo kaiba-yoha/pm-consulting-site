@@ -5,6 +5,7 @@ import {
   buildAmazonLink,
   getBooksByCategory,
   getSaaSByCategory,
+  getSaaSUrl,
   type AffiliateBook,
   type AffiliateSaaS,
 } from '../../lib/affiliates';
@@ -60,7 +61,7 @@ if (!asin && !propTitle) {
     resolvedType = 'saas-tool';
     resolvedTitle = tool.name;
     resolvedDescription = tool.description;
-    resolvedUrl = tool.url;
+    resolvedUrl = getSaaSUrl(tool);
   } else {
     // フォールバック: 全書籍からランダム
     const book = affiliateBooks[Math.floor(Math.random() * affiliateBooks.length)];
