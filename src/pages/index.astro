@@ -15,10 +15,13 @@ const categories = Object.keys(categoryLabels) as Array<keyof typeof categoryLab
 <BaseLayout
   title="PMFlow - コンサルティングPM向け実践メディア"
   description="AIワークフロー・フレームワーク・少人数チーム運営術。人員不足・炎上プロジェクトを抱えるPMへの実践的情報を発信します。"
+  ogImage="/hero-workflow.jpg"
 >
   <!-- Hero Section -->
-  <section class="bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 text-white">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+  <section class="relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 text-white">
+    <img src="/hero-workflow.jpg" alt="プロジェクトの依存関係を表すネットワーク図" class="absolute inset-0 h-full w-full object-cover opacity-20" loading="eager" />
+    <div class="absolute inset-0 bg-gradient-to-r from-primary-900 via-primary-900/85 to-primary-800/50 pointer-events-none"></div>
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
       <div class="max-w-3xl">
         <div class="inline-flex items-center gap-2 bg-primary-700/60 border border-primary-600 rounded-full px-4 py-1.5 text-sm text-primary-200 mb-6">
           <span class="w-2 h-2 bg-accent-400 rounded-full"></span>
