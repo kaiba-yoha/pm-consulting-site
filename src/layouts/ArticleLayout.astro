@@ -6,6 +6,7 @@ import AffiliateSidebar from '../components/ads/AffiliateSidebar.astro';
 import AffiliateFooter from '../components/ads/AffiliateFooter.astro';
 import { formatDate } from '../lib/utils';
 import type { CollectionEntry } from 'astro:content';
+import ogArticles from '../data/og-articles.json';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -14,12 +15,14 @@ interface Props {
 
 const { post, relatedPosts = [] } = Astro.props;
 const { title, description, pubDate, updatedDate, category, tags, ogImage, noindex } = post.data;
+// Per-article OG image when available, else fall back to the layout default.
+const resolvedOgImage = ogImage ?? (ogArticles.includes(post.id) ? `/og/${post.id}.png` : undefined);
 ---
 
 <BaseLayout
   title={title}
   description={description}
-  ogImage={ogImage}
+  ogImage={resolvedOgImage}
   ogType="article"
   noindex={noindex}
 >

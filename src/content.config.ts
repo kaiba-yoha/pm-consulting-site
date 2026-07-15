@@ -16,7 +16,7 @@ const blog = defineCollection({
     affiliate: z.boolean().default(false),
     ogImage: z.string().optional(),
     noindex: z.boolean().default(false),
-    postedVia: z.enum(['discord-bot', 'manual']).default('manual'),
+    postedVia: z.enum(['discord-bot', 'manual', 'factory-sonnet5']).default('manual'),
     botMessageId: z.string().optional(),
   }),
 });
